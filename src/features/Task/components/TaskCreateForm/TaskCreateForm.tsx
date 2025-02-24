@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTaskStore } from "@/store/task/taskSlice";
 import { Button, TextField } from "@mui/material";
 
-const TaskForm = () => {
+const TaskCreateForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -54,4 +54,4 @@ const TaskForm = () => {
   );
 };
 
-export default TaskForm;
+export default TaskCreateForm;

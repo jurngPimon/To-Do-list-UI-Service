@@ -1,10 +1,17 @@
-import { ITask } from "@/types/task.types";
+import { ITask, ITaskGetResponse } from "@/types/task.types";
 import axiosInstance from "./axiosInstance";
 
 const endpoint = "/tasks";
 
-export const fetchTasksApi = async (): Promise<ITask[]> => {
-  return (await axiosInstance.get<ITask[]>(endpoint)).data;
+export const fetchTasksApi = async (
+  page: number = 1,
+  limit: number = 6
+): Promise<ITaskGetResponse> => {
+  return (
+    await axiosInstance.get<ITaskGetResponse>(endpoint, {
+      params: { page, limit },
+    })
+  ).data;
 };
 
 export const createTaskApi = async (task: Omit<ITask, "id" | "status">) => {
@@ -13,7 +20,7 @@ export const createTaskApi = async (task: Omit<ITask, "id" | "status">) => {
 
 export const updateTaskApi = async (
   id: number,
-  task: { title: string; status: string }
+  task: { title: string; description: string; status: string }
 ) => {
   return (await axiosInstance.patch(`${endpoint}/${id}`, task)).data;
 };

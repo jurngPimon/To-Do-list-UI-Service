@@ -9,17 +9,15 @@ const axiosInstance: AxiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response, // ✅ Pass successful responses
+  (response) => response,
   (error: AxiosError) => {
-    console.error("❌ Axios Error:", error.response?.status, error.message); // ✅ Logs error globally
-
     if (error.response?.status === 401) {
       console.warn("⚠️ Unauthorized - Redirecting to login...");
     } else if (error.response?.status === 500) {
       console.warn("⚠️ Server Error - Please try again later.");
     }
 
-    return Promise.reject(error); // ✅ Keeps the error so `catch` can handle it in API functions
+    return Promise.reject(error);
   }
 );
 

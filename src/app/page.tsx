@@ -1,18 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { Box, Button, Typography } from "@mui/material";
-import { TaskList, TaskForm } from "@/features/Task";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { TaskList, TaskCreateForm, TaskPagination } from "@/features/Task";
 import { useTaskStore } from "@/store/task";
 import { useModalStore } from "@/store";
 
 export default function Home() {
-  const { fetchTasks } = useTaskStore.getState().apiController;
-  const { handleOpen } = useModalStore();
+  const {
+    apiController: { fetchTasks },
+  } = useTaskStore.getState();
+  const { handleOpen } = useModalStore.getState();
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    fetchTasks(1);
+  }, [1]);
 
   return (
     <div>
@@ -21,17 +23,24 @@ export default function Home() {
           🏆 Task Board
         </Typography>
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpen(<TaskForm />)}
-        >
-          ➕ Add Task
-        </Button>
+        <Box mb={3}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpen(<TaskCreateForm />)}
+          >
+            ➕ Add Task
+          </Button>
+        </Box>
 
-        <TaskList />
+        <Box mb={3}>
+          <Typography variant="h6">Tasks:</Typography>
+          <TaskList />
+        </Box>
 
-        {/* Add Task Modal */}
+        <Stack spacing={2} alignItems="center">
+          <TaskPagination />
+        </Stack>
       </Box>
     </div>
   );

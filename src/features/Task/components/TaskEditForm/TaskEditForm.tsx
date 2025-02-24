@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@mui/material";
 import { TaskStatusType } from "@/types/task.types";
-
+import useModalStore from "@/store/modal/modalSlice";
 interface TaskEditFormProps {
   id: number;
 }
@@ -25,7 +25,8 @@ const TaskEditForm = ({ id }: TaskEditFormProps) => {
   );
 
   const { updateTaskApi } = useTaskStore.getState().apiController;
-  console.log("targetTask", targetTask, status);
+  const { handleClose } = useModalStore.getState();
+
   return (
     <div>
       <TextField
@@ -81,14 +82,14 @@ const TaskEditForm = ({ id }: TaskEditFormProps) => {
         color="primary"
         sx={{ mt: 2 }}
         fullWidth
-        onClick={() => {
-          updateTaskApi(id, {
+        onClick={async () => {
+          await updateTaskApi(id, {
             title: title,
             description: description,
             status: status,
           });
-          setTitle("");
-          setDescription("");
+
+          handleClose();
         }}
       >
         Update Task

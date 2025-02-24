@@ -10,3 +10,8 @@ export interface ITask {
   description: string;
   status: TaskStatusType;
 }
+
+export interface ITaskGetResponse {
+  tasks: ITask[];
+  total: number;
+}
