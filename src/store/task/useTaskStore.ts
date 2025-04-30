@@ -55,10 +55,13 @@ export const useTaskStore = create<TaskSlice>((set, get) => ({
       }
     },
     deleteTaskApi: async (id) => {
+      const {
+        currentPage,
+        apiController: { fetchTasks },
+      } = get();
       try {
         await deleteTaskApi(id);
-        const tasks = get().tasks.filter((task) => task.id !== id);
-        set({ tasks });
+        await fetchTasks(currentPage);
       } catch (error) {
         console.error(error);
       }

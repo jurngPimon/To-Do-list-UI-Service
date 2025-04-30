@@ -40,7 +40,8 @@ const Tasks = ({ id, title, description, status }: ITask) => {
           </IconButton>
         </Box>
         <CardContent>
-          <Typography variant="h6">{title}</Typography>
+          <Typography variant="body2">ID: {id}</Typography>
+          <Typography variant="h5">{title}</Typography>
           {description ? (
             <Typography variant="body2" color="textSecondary">
               {description}

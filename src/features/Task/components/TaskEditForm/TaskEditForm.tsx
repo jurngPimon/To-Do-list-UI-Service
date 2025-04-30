@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTaskStore } from "@/store/task/taskSlice";
+import { useTaskStore } from "@/store/task/useTaskStore";
 import {
   Button,
   FormControl,
@@ -11,24 +11,52 @@ import {
   TextField,
 } from "@mui/material";
 import { TaskStatusType } from "@/types/task.types";
-import useModalStore from "@/store/modal/modalSlice";
+import { useModalStore } from "@/store/modal/useModalStore";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { schema } from "./TaskEditForm.util";
+
 interface TaskEditFormProps {
   id: number;
 }
 
+interface TaskFormInputs {
+  title: string;
+  description: string;
+  status: TaskStatusType;
+}
+
 const TaskEditForm = ({ id }: TaskEditFormProps) => {
   const targetTask = useTaskStore.getState().getTaskById(id);
-  const [title, setTitle] = useState(targetTask?.title ?? "");
-  const [description, setDescription] = useState(targetTask?.description ?? "");
-  const [status, setStatus] = useState<TaskStatusType>(
-    targetTask?.status ?? TaskStatusType.ToDo
-  );
+  // const [title, setTitle] = useState(targetTask?.title ?? "");
+  // const [description, setDescription] = useState(targetTask?.description ?? "");
+  // const [status, setStatus] = useState<TaskStatusType>(
+  //   targetTask?.status ?? TaskStatusType.ToDo
+  // );
 
   const { updateTaskApi } = useTaskStore.getState().apiController;
   const { handleClose } = useModalStore.getState();
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TaskFormInputs>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      title: targetTask?.title ?? "",
+      description: targetTask?.description ?? "",
+      status: targetTask?.status ?? TaskStatusType.ToDo,
+    },
+  });
+
+  const onSubmit: SubmitHandler<TaskFormInputs> = async (data) => {
+    await updateTaskApi(id, data);
+    handleClose();
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <TextField
         type="text"
         name="id"
@@ -42,59 +70,46 @@ const TaskEditForm = ({ id }: TaskEditFormProps) => {
       />
       <TextField
         type="text"
-        name="title"
-        placeholder="Title"
         label="Title"
-        id="title"
         fullWidth
-        onChange={(e) => setTitle(e.target.value)}
-        value={title}
+        {...register("title")}
+        error={!!errors.title}
+        helperText={errors.title?.message}
         sx={{ mb: 2 }}
       />
       <TextField
         type="text"
         label="Description"
-        placeholder="Description"
-        name="description"
-        id="description"
         fullWidth
-        onChange={(e) => setDescription(e.target.value)}
-        value={description}
+        {...register("description")}
+        error={!!errors.description}
+        helperText={errors.description?.message}
         sx={{ mb: 2 }}
       />
       <FormControl fullWidth>
-        <InputLabel id="status-label">Status</InputLabel>{" "}
+        <InputLabel id="status-label">Status</InputLabel>
         <Select
           labelId="status-label"
-          label="Status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value as TaskStatusType)}
+          {...register("status")}
+          defaultValue={targetTask?.status ?? TaskStatusType.ToDo}
         >
           {Object.entries(TaskStatusType).map(([key, value]) => (
-            <MenuItem key={key} value={value} selected={status === value}>
+            <MenuItem key={key} value={value}>
               {value}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
       <Button
+        type="submit"
         variant="contained"
         color="primary"
         sx={{ mt: 2 }}
         fullWidth
-        onClick={async () => {
-          await updateTaskApi(id, {
-            title: title,
-            description: description,
-            status: status,
-          });
-
-          handleClose();
-        }}
       >
         Update Task
       </Button>
-    </div>
+    </form>
   );
 };
 

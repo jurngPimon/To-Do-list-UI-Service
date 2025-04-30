@@ -37,7 +37,7 @@ const TaskPagination = () => {
   }, [taskTotal, TaskLimit]);
 
   useEffect(() => {
-    if (tasks.length === 0) {
+    if (tasks.length === 0 && taskTotal > 0) {
       fetchTasks(Math.max(currentPage - 1, 1));
     }
   }, [tasks]);

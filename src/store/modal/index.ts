@@ -1,1 +1,1 @@
-export { default as useModalStore } from "./modalSlice";
+export { useModalStore } from "./useModalStore";

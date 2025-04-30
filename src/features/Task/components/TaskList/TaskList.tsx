@@ -2,11 +2,11 @@
 
 import { Card, CardContent, Grid, Typography } from "@mui/material";
 import { Task } from "../Task";
-import { useTaskStore } from "@/store/task/taskSlice";
+import { useTaskStore } from "@/store/task/useTaskStore";
 
 const TaskList = () => {
   const tasks = useTaskStore((s) => s.tasks);
-
+  console.log({ tasks });
   return (
     <div>
       <Grid container spacing={2} sx={{ mt: 2 }}>

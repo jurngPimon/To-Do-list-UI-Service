@@ -1,4 +1,9 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+} from "axios";
+import { getCookie } from "@/utils";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_API_URL,
@@ -7,6 +12,20 @@ const axiosInstance: AxiosInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// ✅ Intercept requests to attach Firebase Token
+axiosInstance.interceptors.request.use(
+  async (config: InternalAxiosRequestConfig) => {
+    const token = await getCookie("firebaseToken");
+
+    if (token) {
+      config.headers.set("Authorization", `Bearer ${token}`);
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(new Error(error.message || "Request error"))
+);
 
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -17,7 +36,7 @@ axiosInstance.interceptors.response.use(
       console.warn("⚠️ Server Error - Please try again later.");
     }
 
-    return Promise.reject(error);
+    return Promise.reject(new Error(error.message || "Response error"));
   }
 );
 

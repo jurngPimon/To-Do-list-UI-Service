@@ -1,37 +1,56 @@
 "use client";
 
-import { useState } from "react";
-import { useTaskStore } from "@/store/task/taskSlice";
+import { useTaskStore } from "@/store/task/useTaskStore";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, TextField } from "@mui/material";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { validateSchema } from "./TaskCreateForm.util";
+
+interface ITaskCreateForm {
+  title: string;
+  description: string;
+}
 
 const TaskCreateForm = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-
   const { createTaskApi } = useTaskStore.getState().apiController;
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ITaskCreateForm>({
+    resolver: yupResolver(validateSchema),
+  });
+
+  const onSubmit: SubmitHandler<ITaskCreateForm> = (data) => {
+    createTaskApi({
+      title: data.title,
+      description: data.description,
+    });
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <TextField
         type="text"
-        name="title"
         placeholder="Title"
         label="Title"
         id="title"
         fullWidth
-        onChange={(e) => setTitle(e.target.value)}
-        value={title}
+        {...register("title")}
+        error={!!errors.title}
+        helperText={errors.title?.message}
         sx={{ mb: 2 }}
       />
       <TextField
         type="text"
         label="Description"
         placeholder="Description"
-        name="description"
         id="description"
         fullWidth
-        onChange={(e) => setDescription(e.target.value)}
-        value={description}
+        {...register("description")}
+        error={!!errors.description}
+        helperText={errors.title?.message}
         sx={{ mb: 2 }}
       />
       <Button
@@ -39,18 +58,11 @@ const TaskCreateForm = () => {
         color="primary"
         sx={{ mt: 2 }}
         fullWidth
-        onClick={() => {
-          createTaskApi({
-            title: title,
-            description: description,
-          });
-          setTitle("");
-          setDescription("");
-        }}
+        type="submit"
       >
         Add Task
       </Button>
-    </div>
+    </form>
   );
 };
 
